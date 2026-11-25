@@ -22,11 +22,17 @@ for g in GONE:
 # ---------------- configs
 f = 'ITS/Parts/STMS_Ship_Leg.cfg'
 sub(f, ("<#ef7b06>Goes on the four leg nodes this mod adds to SEP's Block 3 ship core, or anywhere on its barrel.</color>", '<#ef7b06>Attaches anywhere on a 5.6 m barrel.</color>'))
-t = rd('ITS/Parts/STMS_HLS_Core.cfg'); n = re.sub(r'Mounts three sea-level and three vacuum Raptor 3s from SEP[^\n]*', 'Mounts three sea-level and three vacuum engines of your choice, with a docking node on the far side.', t); assert n != t; wr('ITS/Parts/STMS_HLS_Core.cfg', n)
-sub('ITS/Parts/STMS_B3_Depot.cfg', ('<#ef7b06>Goes on the Expendable Block 3 Core.</color>', '<#ef7b06>Goes on the Starship HLS Core.</color>'),
+sub('ITS/Parts/STMS_B3_Depot.cfg', ('<#ef7b06>Goes on the Expendable Block 3 Core.</color>', '<#ef7b06>Goes on any 5.6 m tank.</color>'),
     ("Meets them with SEP's docking hardware on the core", 'Meets them with a docking port on the core'))
-sub('ITS/Parts/STMS_B3_FairingBase.cfg', ('Closes off the top of the Expendable Block 3 Core with', 'Closes off the top of the Starship HLS Core with'))
-sub('Parts/SEP_CW_Parts.cfg', ('winch node on the V3 cargo bay ceiling', 'winch node on the HLS cargo section ceiling'))
+sub('ITS/Parts/STMS_B3_FairingBase.cfg', ('Closes off the top of the Expendable Block 3 Core with', 'Closes off the top of a 5.6 m stage with'))
+sub('Parts/SEP_CW_Parts.cfg', ('winch node on the V3 cargo bay ceiling', 'ceiling of a cargo bay'))
+D_ = {'Lift': 'Goes on a node or any surface at the top of a 22 m drop.', 'LiftCable': 'Goes on a node or any surface at the top of a 22 m drop, under cover.', 'Crane': 'Stands on a cargo bay floor by the door; hang the Cargo Winch Hoist under its crossbar.',
+      'FloorMid': 'Stands on a cargo bay floor.', 'FloorTop': 'Stands on a cargo bay floor, with a Mid floor.', 'Tray': 'Goes on the top node of a cargo floor, or any surface.'}
+for k, v in D_.items():                                 # where they go, without the HLS hulls
+    f = 'ITS/Parts/STMS_HLS_%s.cfg' % k; t = rd(f); n = re.sub(r'<#ef7b06>.*?</color>', '<#ef7b06>' + v + '</color>', t, count=1); assert n != t, f
+    for a, b in ((' to ride the track down to the surface', ' to reach the surface'), (' Open the airlock door, lower the deck, then slide', ' Lower the deck, then slide'), (' and back to 0 before folding the deck and closing the door.', ' and back to 0 before folding the deck.'), (' If it sulks, there is a ladder down the same track.', ' The rails it rides were on the HLS hull, so here it runs without them.'),
+                 (' Open the airlock door, run the cage out', ' Run the cage out'), (' before bringing the cage in and closing the door.', ' before bringing the cage in.'), (' Open the door, lift the load', ' Lift the load'), ('Crane out and ramp out first, then', 'Crane out first, then'), (' and the winch platform up under the ramp,', ' and the winch platform beside it,')): n = n.replace(a, b)
+    wr(f, n)
 sub('ITS/Patches/STMS_HLS.cfg', ("a tenth of the boiloff of SEP's tanks", 'little boiloff'))
 t = rd('ITS/Patches/ITS_Mods.cfg'); wr('ITS/Patches/ITS_Mods.cfg', t[:t.index("// The parts sit in SEP's category")])
 sub('ITS/Extras/ITS_PBR.cfg.txt', (", so the hull matches SEP's engines under Deferred", ''))
@@ -34,7 +40,7 @@ sub('ITS/Patches/ITS_Waterfall.cfg', ("Engine plumes come with SEP's engines.", 
 for f in glob.glob(p('**', '*.cfg'), recursive=True):
     t = open(f, encoding='utf-8').read(); n = re.sub(r'(tags = [^\n]*)\bsep ', r'\1', t)
     if n != t: open(f, 'w', encoding='utf-8').write(n)
-cut = {'STMS_HLS_Docking_M', 'STMS_HLS_Docking_F', 'STMS_B3_CoreExp', 'STMS_B3_NoseCrew', 'STMS_B3_NoseCrewCargo', 'STMS_HLS_Cargo'}
+cut = {'STMS_HLS_Core', 'STMS_HLS_Crew', 'STMS_HLS_CrewTall', 'STMS_HLS_CargoAwning', 'STMS_HLS_Leg', 'STMS_HLS_LegFaired', 'STMS_HLS_LegShroud', 'STMS_HLS_PodCover', 'STMS_HLS_Solar', 'STMS_HLS_Depot', 'STMS_HLS_Docking_M', 'STMS_HLS_Docking_F', 'STMS_B3_CoreExp', 'STMS_B3_NoseCrew', 'STMS_B3_NoseCrewCargo', 'STMS_HLS_Cargo'}
 t = rd('Patches/STMS_CCK.cfg').replace("// after the copies of SEP's parts (engine rings, crew nosecones) exist\n", '')
 wr('Patches/STMS_CCK.cfg', re.sub(r'@PART\[(STMS_HLS_Core[^\]]*)\]', lambda m: '@PART[' + '|'.join(q for q in m[1].split('|') if q not in cut) + ']', t))
 # the fairing base's forward thrusters, always on

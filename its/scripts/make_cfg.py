@@ -68,7 +68,11 @@ def antenna(power, kind='INTERNAL'):
                f'antennaPower = {power}', 'antennaCombinable = True')
 
 
+HLS_OUT = {'STMS_HLS_Core', 'STMS_HLS_Crew', 'STMS_HLS_CrewTall', 'STMS_HLS_CargoAwning', 'STMS_HLS_Leg', 'STMS_HLS_LegFaired', 'STMS_HLS_LegShroud', 'STMS_HLS_PodCover', 'STMS_HLS_Solar', 'STMS_HLS_Depot'}      # this fork keeps only the robotic HLS parts
+
+
 def part(name, title, desc, tags, mass, cost, cat, tech, extra=(), modules=(), rules='1,1,1,1,0', profiles='size6', crash=20, model=None, node_attach=None, tmax=1700, skin=2700, brk=30000, stackSym=None):
+    if name in HLS_OUT: return
     L = [f'name = {name}', 'module = Part', 'author = lsamman', block('MODEL', f'model = StarshipThingyMabobsAndSuch/ITS/Parts/{model or name}'), 'rescaleFactor = 1', 'scale = 1']
     L += nodes(model or name)
     if node_attach:

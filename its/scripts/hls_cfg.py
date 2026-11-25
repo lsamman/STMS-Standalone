@@ -6,7 +6,7 @@ import hls_layout as HL
 
 def write(G):
     part, mod, block, res, command, sas, wheel, antenna, RCS_FX, SND, have, f5 = [G[k] for k in ('part', 'mod', 'block', 'res', 'command', 'sas', 'wheel', 'antenna', 'RCS_FX', 'SND', 'have', 'f5')]
-    if not have('STMS_HLS_Core'): return
+    if not have('STMS_HLS_Lift'): return
     G['MFR'] = 'Starship Thingy Mabobs and Such'
     T = 'starship sep hls moon lunar lander artemis block3 v3'
     tank = lambda units: mod('ModuleB9PartSwitch', 'moduleID = HLS_Fuel', 'switcherDescription = Propellant', f'baseVolume = {units}',
@@ -114,10 +114,10 @@ def write(G):
          extra=['stagingIcon = DECOUPLER_HOR', 'stageOffset = 1', 'childStageOffset = 1', 'sound_decoupler_fire = decouple'],
          modules=[mod('ModuleDecouple', 'ejectionForce = 10', 'explosiveNodeID = mount', 'menuName = Jettison Cover', 'stagingEnabled = True')])
     part('STMS_HLS_Lift', 'Starship HLS Elevator', f'<#ef7b06>Goes on the node in the crew section\'s airlock.</color> Open the airlock door, lower the deck, then slide Target Extension to -{HL.LIFT_TRAVEL} to ride the track down to the surface, and back to 0 before folding the deck and closing the door. Needs Breaking Ground. If it sulks, there is a ladder down the same track.',
-         T + ' elevator lift winch platform', .5, 3200, 'Payload', 'veryHeavyRocketry', rules='1,0,0,1,0', profiles='size1, srf', crash=14, skin=1900, brk=1500,
+         T + ' elevator lift winch platform', .5, 3200, 'Payload', 'veryHeavyRocketry', node_attach='0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1', rules='1,1,0,1,0', profiles='size1, srf', crash=14, skin=1900, brk=1500,
          modules=[G['piston']('LiftAnchor', 'LiftServo', 'cargo', HL.LIFT_TRAVEL, 1.0, 1.5, 'Y'), anim('deckFold', 'Lower Deck', 'Fold Deck', 'Elevator Deck')])
     part('STMS_HLS_LiftCable', 'Starship HLS Elevator (Cable)', f'<#ef7b06>Goes on the node in the crew section\'s airlock, instead of the rail elevator; set the Elevator track of the core and the crew section to None.</color> An open cage on four cables. Open the airlock door, run the cage out, then slide Target Extension to -{HL.LIFT_TRAVEL} to reach the surface, and back to 0 before bringing the cage in and closing the door. Needs Breaking Ground.',
-         T + ' elevator lift cable cage winch', .6, 3600, 'Payload', 'veryHeavyRocketry', rules='1,0,0,1,0', profiles='size1, srf', crash=14, skin=1900, brk=1500,
+         T + ' elevator lift cable cage winch', .6, 3600, 'Payload', 'veryHeavyRocketry', node_attach='0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1', rules='1,1,0,1,0', profiles='size1, srf', crash=14, skin=1900, brk=1500,
          modules=[G['piston']('LiftAnchor', 'LiftServo', 'cargo', HL.LIFT_TRAVEL, 1.0, 1.5, 'Y'), anim('cageOut', 'Run Cage Out', 'Bring Cage In', 'Elevator Cage'), mod('ModuleSTMSCable', 'count = 4')])
     part('STMS_HLS_Solar', 'Starship HLS Solar Array', 'Fourteen panels nested in a box on rails behind a flush hatch. Goes on the four bay nodes of the crew section. Tracks the sun once it is all the way out; Lock Tracking holds it still, and Rotate Array Down hangs it along the hull, locked. Do that after landing: hanging down it passes over the landing thrusters.',
          T + ' solar panel array power roll out', .25, 4200, 'Electrical', 'experimentalElectrics', rules='1,0,0,0,0', profiles='srf, size1', crash=12, skin=2000, brk=800,
@@ -127,17 +127,17 @@ def write(G):
     if have('STMS_HLS_Crane'):
         look = block('MODULE', 'name = FXModuleLookAtConstraint', *[block('CONSTRAINLOOKFX', f'rotatorsName = {r}', f'targetName = {t}') for k in 'LR' for r, t in ((f'craneLow{k}', f'craneTip{k}'), (f'craneTop{k}', f'craneFoot{k}'))])
         part('STMS_HLS_Crane', 'Starship HLS Crane Frame', f'<#ef7b06>Goes on the crane node by the sill of the awning-door cargo section; hang the Cargo Winch Hoist under its crossbar.</color> A frame that leans out over the sill with the winch on it. Open the door, lift the load clear of the floor, then slide <b>Target Extension</b> to -{HL.CR_TRAVEL}. The slider is hidden while the piston is <b>Locked</b>. In action groups, Retract runs it out and Extend brings it in.',
-             T + ' crane frame winch hoist cargo', .9, 3200, 'Payload', 'veryHeavyRocketry', rules='1,0,1,1,0', profiles='size1, srf', crash=14, skin=1900, brk=5000,
+             T + ' crane frame winch hoist cargo', .9, 3200, 'Payload', 'veryHeavyRocketry', node_attach='0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1', rules='1,1,1,1,0', profiles='size1, srf', crash=14, skin=1900, brk=5000,
              modules=[G['piston']('CraneAnchor', 'CraneServo', 'hoist', HL.CR_TRAVEL, .25, .5, 'Z'), look])
     for w, title, txt, m in (('Mid', 'Starship HLS Cargo Floor (Mid)', 'Carries the second load over the stowed crane. Room for about 2.3 m of it, or 1.3 m with a Top floor fitted.', .6), ('Top', 'Starship HLS Cargo Floor (Top)', 'Carries a third, flat load, up to about 0.8 m tall, under the header tank, and lands on the Mid floor.', .5)):
         if not have('STMS_HLS_Floor' + w): continue
         y, zp, zr, cy, ro = HL.FLOORS[w]; tr = round(zp - zr, 2)
         part('STMS_HLS_Floor' + w, title, f'<#ef7b06>Goes on node {"floor1" if w == "Mid" else "floor2"} of the awning-door cargo section.</color> {txt} Keep the load on a decoupler or docking port until the floor is down. Crane out and ramp out first, then slide <b>Target Extension</b> to -{tr}. The slider is hidden while the piston is <b>Locked</b>. In action groups, Retract lowers it and Extend raises it.',
-             T + ' cargo floor deck pez stack dispenser elevator rover', m, 3000, 'Payload', 'veryHeavyRocketry', rules='1,0,1,1,0', profiles='size1, srf', crash=14, skin=1900, brk=5000,
+             T + ' cargo floor deck pez stack dispenser elevator rover', m, 3000, 'Payload', 'veryHeavyRocketry', node_attach='0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1', rules='1,1,1,1,0', profiles='size1, srf', crash=14, skin=1900, brk=5000,
              modules=[G['piston']('FloorAnchor', 'FloorServo', 'cargo', tr, .4, 1, 'Y')])
     if have('STMS_HLS_Tray'):
         part('STMS_HLS_Tray', 'Starship HLS Cargo Tray', f'<#ef7b06>Goes on the top node of a cargo floor, carriage to the door.</color> For loads without wheels: with the floor down and the winch platform up under the ramp, slide <b>Target Extension</b> to -{HL.TRAY_TRAVEL} to run the load out over the platform, then decouple it. It drops a hand\'s width onto the deck.',
-             T + ' cargo tray slide pallet', .3, 1800, 'Payload', 'veryHeavyRocketry', rules='1,0,1,1,0', profiles='size1, srf', crash=14, skin=1900, brk=5000, modules=[G['piston']('TrayAnchor', 'TrayServo', 'cargo', HL.TRAY_TRAVEL, .3, .6, 'Z')])
+             T + ' cargo tray slide pallet', .3, 1800, 'Payload', 'veryHeavyRocketry', node_attach='0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1', rules='1,1,1,1,0', profiles='size1, srf', crash=14, skin=1900, brk=5000, modules=[G['piston']('TrayAnchor', 'TrayServo', 'cargo', HL.TRAY_TRAVEL, .3, .6, 'Z')])
     if have('STMS_B3_Depot'):
         import depot_layout as D
         dt = mod('ModuleB9PartSwitch', 'moduleID = HLS_Fuel', 'switcherDescription = Propellant', f'baseVolume = {D.UNITS}', block('SUBTYPE', 'name = Methalox', 'title = Methalox', 'tankType = ITSLMOX', 'percentFilled = 0', 'primaryColor = #8fb7d9', 'secondaryColor = #e8e8e8'))

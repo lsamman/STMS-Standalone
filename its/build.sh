@@ -16,7 +16,6 @@ python3 scripts/make_cfg.py build/mu build/cfg
 D=../GameData/StarshipThingyMabobsAndSuch/ITS
 rm -rf "$D"; mkdir -p "$D/Parts" "$D/Patches" "$D/Extras"
 cp build/mu/*.mu build/tex/*.dds build/cfg/*.cfg "$D/Parts/"
-cp build/iva/*.cfg "$D/Parts/"
 cp build/patches/*.cfg patches/*.cfg "$D/Patches/"
 cp extras/* "$D/Extras/"
 mkdir -p ../GameData/StarshipThingyMabobsAndSuch/Plugins; plugin/build.sh "$PWD/build/plugin" && cp build/plugin/STMS.dll ../GameData/StarshipThingyMabobsAndSuch/Plugins/
